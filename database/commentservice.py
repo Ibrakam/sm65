@@ -10,7 +10,7 @@ def create_comment_db(text, uid, pid):
         return True
 
 
-def get_all_or_exact_comments(comment_id=0):
+def get_all_or_exact_comments_db(comment_id=0):
     with next(get_db()) as db:
 
         if comment_id:
