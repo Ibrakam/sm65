@@ -1,15 +1,17 @@
 from database import get_db
 from database.models import User
+from api.user.schemas import UserSchema
 
 
 # Функия для добавления пользователя в бд
-def create_user_db(name, surname, username, password, email, phone_number, birthday, city):
+def create_user_db(user: UserSchema):
     with next(get_db()) as db:
-        new_user = User(name=name, surname=surname, username=username, password=password, email=email,
-                        phone_number=phone_number, birthday=birthday, city=city)
+        user_data = user.model_dump()
+        new_user = User(**user_data)
         db.add(new_user)
         db.commit()
         return True
+
 
 # Получение всех или определенного пользователя
 def get_all_or_exact_user(user_id=0):
@@ -29,7 +31,6 @@ def delete_user_db(user_id):
         db.query(User).filter_by(id=user_id).delete()
         db.commit()
         return True
-
 
 
 # Изменение пользователя

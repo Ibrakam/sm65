@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <style>
+    :root{
+      --bg:#0f1218;
+      --surface:#151922;
+      --muted:#7c8699;
+      --text:#e8eefc;
+      --accent:#6aa3ff;
+      --accent-2:#e64a30;
+      --card:#1a2030cc;
+      --ring: 0 0 0 2px rgba(106,163,255,.35), 0 10px 25px rgba(0,0,0,.35);
+      --radius:14px;
+    }
+
+    /* Reset & base */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(106,163,255,.25), transparent 50%),
+        radial-gradient(1200px 600px at 110% 10%, rgba(230,74,48,.18), transparent 55%),
+        linear-gradient(180deg, #0f1218, #0b0e14 60%);
+    }
+
+    a{color:inherit;text-decoration:none}
+    img{display:block;max-width:100%;height:auto}
+
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(8px);
+      background: color-mix(in oklab, var(--surface) 85%, transparent);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    header .wrap{
+      max-width:1100px; margin:0 auto; padding:16px 20px;
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.3px;
+    }
+    .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+    nav ul{display:flex; gap:14px; list-style:none; padding:0; margin:0}
+    nav a{
+      padding:8px 12px; border-radius:10px; color:#cbd6f6;
+      transition: transform .2s ease, background .2s ease, color .2s ease;
+    }
+    nav a:hover{background:rgba(255,255,255,.06); color:white; transform:translateY(-1px)}
+    nav a.active{background:linear-gradient(180deg, rgba(106,163,255,.25), rgba(106,163,255,.05)); color:white; box-shadow: var(--ring)}
+
+    .container{
+      max-width:1100px; margin:28px auto; padding:0 20px;
+      display:grid; grid-template-columns: 1.8fr .9fr; gap:22px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--radius);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      overflow:hidden;
+      animation: slideUp .6s ease both;
+    }
+
+    .card .pad{padding:18px}
+
+    /* Profile */
+    #profile-card .header{
+      display:flex; align-items:center; gap:14px; margin-bottom:8px;
+    }
+    .avatar{
+      width:72px;height:72px;border-radius:50%;
+      background:linear-gradient(135deg, rgba(106,163,255,.25), rgba(230,74,48,.25));
+      padding:2px;
+    }
+    .avatar img{border-radius:50%}
+
+    .muted{color:var(--muted)}
+
+    /* Composer */
+    #new-post textarea{
+      width:100%; min-height:110px; resize:vertical;
+      padding:12px 14px; border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background:#111625; color:var(--text); outline:none;
+      transition: box-shadow .2s ease, border-color .2s ease;
+    }
+    #new-post textarea:focus{border-color:rgba(106,163,255,.6); box-shadow: var(--ring)}
+    .btn{
+      appearance:none; border:0; padding:10px 14px; border-radius:12px; font-weight:600;
+      background:linear-gradient(180deg, color-mix(in oklab, var(--accent) 78%, white 8%), color-mix(in oklab, var(--accent) 60%, black 12%));
+      color:#0a0e16;
+      box-shadow: 0 8px 18px rgba(106,163,255,.35);
+      cursor:pointer; transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
+    }
+    .btn:hover{transform:translateY(-1px); filter:saturate(1.05)}
+    .btn:active{transform:translateY(0); box-shadow: 0 4px 10px rgba(0,0,0,.35)}
+
+    /* Feed */
+    #feed .post{padding:16px 18px; border-top:1px solid rgba(255,255,255,.06)}
+    #feed .post:first-child{border-top:0}
+    .post h4{margin:0 0 6px 0}
+    .meta{font-size:.9rem; color:#9aa6bf}
+    .actions{display:flex; gap:10px; margin-top:8px}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      font-size:.9rem; padding:6px 10px; border-radius:999px;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+      transition: background .2s ease, transform .2s ease;
+      cursor:default;
+    }
+    .chip:hover{background:rgba(255,255,255,.09); transform:translateY(-1px)}
+
+    /* Sidebar */
+    .sidebar .friend{
+      display:flex; align-items:center; gap:10px; padding:10px 12px;
+      border-radius:12px; transition: background .2s ease, transform .2s ease;
+    }
+    .sidebar .friend:hover{background:rgba(255,255,255,.06); transform:translateX(2px)}
+    .dot-online{width:8px;height:8px;background:#32d583;border-radius:50%}
+
+    footer{
+      max-width:1100px; margin:24px auto 40px; padding:0 20px;
+      color:#9aa6bf; text-align:center;
+    }
+
+    /* Subtle entrance stagger */
+    main .card{animation-delay:.05s}
+    main #new-post.card{animation-delay:.12s}
+    main #feed.card{animation-delay:.18s}
+    .sidebar.card{animation-delay:.22s}
+
+    /* Animations */
+    @keyframes slideUp{
+      from{opacity:0; transform:translateY(12px)}
+      to{opacity:1; transform:translateY(0)}
+    }
+
+    /* Responsive */
+    @media (max-width: 900px){
+      .container{grid-template-columns: 1fr}
+      header .wrap{flex-wrap:wrap}
+      nav ul{flex-wrap:wrap}
+    }
+  </style>
+</head>
+<body>
+    <header>
+    <div class="wrap">
+      <div class="brand">
+        <span class="dot"></span>
+        <span>SocialNet</span>
+      </div>
+      <nav>
+        <ul>
+          <li><a class="active" href="#">Home</a></li>
+          <li><a href="#">Profile</a></li>
+          <li><a href="#">Messages</a></li>
+          <li><a href="#">Friends</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+    <div class="container">
+        <main class="main">
+            <section id="profile-card" class="card">
+    <div class="pad">
+      <div class="header">
+        <div class="avatar">
+          <img src="https://via.placeholder.com/72" alt="User Avatar">
+        </div>
+        <div>
+          <h2 style="margin:0">John Doe</h2>
+          <div class="muted">@johndoe • Designer &amp; builder</div>
+        </div>
+      </div>
+      <p class="muted">Loves coding, basketball and coffee-fueled night design sprints.</p>
+    </div>
+  </section>
+            <section id="new-post" class="card">
+    <div class="pad">
+      <h3 style="margin:0 0 10px 0">New Post</h3>
+      <form onsubmit="return false">
+        <textarea placeholder="What's on your mind?"></textarea>
+        <div style="margin-top:10px; display:flex; justify-content:flex-end;">
+          <button type="submit" class="btn">Post</button>
+        </div>
+      </form>
+    </div>
+  </section>
+            <section id="feed" class="card">
+    <div class="pad">
+      <article class="post">
+        <h4>Jane Smith</h4>
+        <p>Had a great day at the park! The sunset was unreal.</p>
+        <div class="actions">
+          <span class="chip">❤️ 10 Likes</span>
+          <span class="chip">💬 2 Comments</span>
+        </div>
+      </article>
+      <article class="post">
+        <h4>Mike Johnson</h4>
+        <p>Just finished reading an amazing book. Highly recommend “The Pragmatic Programmer”.</p>
+        <div class="actions">
+          <span class="chip">❤️ 5 Likes</span>
+          <span class="chip">💬 1 Comment</span>
+        </div>
+      </article>
+    </div>
+  </section>
+        </main>
+        <aside class="sidebar card">
+    <div class="pad">
+      <h3 style="margin-top:0">Friends</h3>
+      <div class="friend">
+        <span class="dot-online"></span>
+        <strong>Alice</strong>
+      </div>
+      <div class="friend">
+        <span class="dot-online"></span>
+        <strong>Bob</strong>
+      </div>
+      <div class="friend">
+        <span class="dot-online"></span>
+        <strong>Charlie</strong>
+      </div>
+    </div>
+  </aside>
+    </div>
+    <footer>© 2025 SocialNet</footer>
+</body>
+</html>
