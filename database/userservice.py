@@ -3,9 +3,13 @@ from database.models import User
 
 
 # Функия для добавления пользователя в бд
-def create_user_db():
-    pass
-
+def create_user_db(name, surname, username, password, email, phone_number, birthday, city):
+    with next(get_db()) as db:
+        new_user = User(name=name, surname=surname, username=username, password=password, email=email,
+                        phone_number=phone_number, birthday=birthday, city=city)
+        db.add(new_user)
+        db.commit()
+        return True
 
 # Получение всех или определенного пользователя
 def get_all_or_exact_user(user_id=0):
@@ -20,8 +24,12 @@ def get_all_or_exact_user(user_id=0):
 
 
 # Удаление пользователя из бд
-def delete_user_db():
-    pass
+def delete_user_db(user_id):
+    with next(get_db()) as db:
+        db.query(User).filter_by(id=user_id).delete()
+        db.commit()
+        return True
+
 
 
 # Изменение пользователя
