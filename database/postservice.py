@@ -1,11 +1,13 @@
+from api.post.schemas import PostSchema
 from database import get_db
 from database.models import UserPost
 
 
 # Cоздание поста
-def create_post(title, main_text, uid):
+def create_post(post: PostSchema):
     with next(get_db()) as db:
-        new_post = UserPost(title=title, main_text=main_text, uid=uid)
+        post_data = post.model_dump()
+        new_post = UserPost(**post_data)
         db.add(new_post)
         db.commit()
         return True

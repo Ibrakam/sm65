@@ -196,22 +196,18 @@
   </section>
             <section id="feed" class="card">
     <div class="pad">
+      {% for post in posts%}
       <article class="post">
-        <h4>Jane Smith</h4>
-        <p>Had a great day at the park! The sunset was unreal.</p>
+        <h4>{{ user.name }} {{ user.surname }} </h4>
+        <p>{{ post.title }}</p>
+        <p>{{ post.main_text }}</p>
         <div class="actions">
           <span class="chip">❤️ 10 Likes</span>
           <span class="chip">💬 2 Comments</span>
         </div>
+<!--        <a href="/exact-post/{{ post.id }}"> Посмотреть пост</a>-->
       </article>
-      <article class="post">
-        <h4>Mike Johnson</h4>
-        <p>Just finished reading an amazing book. Highly recommend “The Pragmatic Programmer”.</p>
-        <div class="actions">
-          <span class="chip">❤️ 5 Likes</span>
-          <span class="chip">💬 1 Comment</span>
-        </div>
-      </article>
+      {% endfor %}
     </div>
   </section>
         </main>
