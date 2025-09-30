@@ -9,3 +9,8 @@ Base.metadata.create_all(engine)
 
 app.include_router(user_router)
 app.include_router(photo_router)
+
+
+@app.get("/wqe")
+async def main():
+    pass
