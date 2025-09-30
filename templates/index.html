@@ -186,12 +186,30 @@
             <section id="new-post" class="card">
     <div class="pad">
       <h3 style="margin:0 0 10px 0">New Post</h3>
-      <form onsubmit="return false">
-        <textarea placeholder="What's on your mind?"></textarea>
-        <div style="margin-top:10px; display:flex; justify-content:flex-end;">
-          <button type="submit" class="btn">Post</button>
-        </div>
-      </form>
+       <form id="postForm" onsubmit="return false">
+    <input
+      id="postTitle"
+      type="text"
+      placeholder="Post title"
+      required
+      style="width:100%; padding:8px; margin-bottom:10px;"
+    />
+
+    <textarea
+      id="postText"
+      placeholder="What's on your mind?"
+      required
+      rows="5"
+      style="width:100%; padding:8px;"
+    ></textarea>
+
+
+
+    <div style="margin-top:10px; display:flex; gap:8px; justify-content:flex-end; align-items:center;">
+      <span id="postStatus" style="font-size:12px; opacity:.8;"></span>
+      <button id="postBtn" type="submit" class="btn">Post</button>
+    </div>
+  </form>
     </div>
   </section>
             <section id="feed" class="card">
@@ -230,5 +248,70 @@
   </aside>
     </div>
     <footer>© 2025 SocialNet</footer>
+
+
+<script>
+  const form = document.getElementById("postForm");
+  const titleEl = document.getElementById("postTitle");
+  const textEl  = document.getElementById("postText");
+  const btn     = document.getElementById("postBtn");
+  const status  = document.getElementById("postStatus");
+
+  // Если uid хранишь где-то (например в localStorage) — подставь автоматически:
+  const uidEl = {{user.id}}
+
+  form.addEventListener("submit", async () => {
+    // простая валидация
+    if (!titleEl.value.trim() || !textEl.value.trim() ) {
+      status.textContent = "Заполни все поля.";
+      return;
+    }
+
+    const payload = {
+      title: titleEl.value.trim(),
+      main_text: textEl.value.trim(),
+      uid: Number(uidEl)
+    };
+
+    btn.disabled = true;
+    status.textContent = "Отправляю…";
+
+    try {
+      const res = await fetch("/post/create_post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      // FastAPI по умолчанию вернёт 422 при валидационной ошибке
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        // покажем причину, если есть detail из FastAPI
+        const msg = data?.detail
+          ? (Array.isArray(data.detail) ? data.detail.map(d => d.msg).join("; ") : data.detail)
+          : `HTTP ${res.status}`;
+        status.textContent = "Ошибка: " + msg;
+        btn.disabled = false;
+        return;
+      }
+
+      // Твой эндпоинт, судя по примеру, возвращает {"status": 1, "message": ...}
+      if (data.status === 1) {
+        status.textContent = "Пост добавлен ✔";
+        titleEl.value = "";
+        textEl.value = "";
+        // uid обычно не чистим
+      } else {
+        status.textContent = "Ошибка: " + (data.message ?? "Неизвестная ошибка");
+      }
+    } catch (err) {
+      console.error(err);
+      status.textContent = "Сеть недоступна или сервер не отвечает.";
+    } finally {
+      btn.disabled = false;
+    }
+  });
+</script>
 </body>
 </html>
