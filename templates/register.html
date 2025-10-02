@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register • SocialNet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#0f1218; --surface:#151922; --muted:#7c8699; --text:#e8eefc;
+      --accent:#6aa3ff; --accent-2:#e64a30; --card:#1a2030cc; --radius:14px;
+      --ring: 0 0 0 2px rgba(106,163,255,.35), 0 10px 25px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(106,163,255,.25), transparent 50%),
+        radial-gradient(1200px 600px at 110% 10%, rgba(230,74,48,.18), transparent 55%),
+        linear-gradient(180deg, #0f1218, #0b0e14 60%);
+    }
+    header{position:sticky; top:0; z-index:10; backdrop-filter: blur(8px);
+      background: color-mix(in oklab, var(--surface) 85%, transparent);
+      border-bottom: 1px solid rgba(255,255,255,.06);}
+    header .wrap{max-width:1100px; margin:0 auto; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px;}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.3px;}
+    .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+    nav ul{display:flex; gap:14px; list-style:none; padding:0; margin:0}
+    nav a{padding:8px 12px; border-radius:10px; color:#cbd6f6; text-decoration:none;
+      transition: transform .2s ease, background .2s ease, color .2s ease;}
+    nav a:hover{background:rgba(255,255,255,.06); color:white; transform:translateY(-1px)}
+    nav a.active{background:linear-gradient(180deg, rgba(106,163,255,.25), rgba(106,163,255,.05)); color:white; box-shadow: var(--ring)}
+    .container{max-width:900px; margin:32px auto; padding:0 20px;}
+    .card{background:var(--card); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); box-shadow: 0 10px 30px rgba(0,0,0,.35); overflow:hidden; animation: slideUp .6s ease both;}
+    .card .pad{padding:22px}
+    h1{margin:0 0 6px 0}
+    p.muted{color:var(--muted); margin-top:0}
+    .grid{display:grid; grid-template-columns: 1fr 1fr; gap:14px}
+    .field{display:flex; flex-direction:column; gap:6px}
+    label{font-size:.95rem; color:#cbd6f6}
+    input, select{
+      width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.08);
+      background:#111625; color:var(--text); outline:none;
+      transition:border-color .2s ease, box-shadow .2s ease;
+    }
+    input:focus, select:focus{border-color:rgba(106,163,255,.6); box-shadow: var(--ring)}
+    .actions{display:flex; gap:10px; justify-content:flex-end; align-items:center; margin-top:6px}
+    .btn{
+      appearance:none; border:0; padding:12px 16px; border-radius:12px; font-weight:600;
+      background:linear-gradient(180deg, color-mix(in oklab, var(--accent) 78%, white 8%), color-mix(in oklab, var(--accent) 60%, black 12%));
+      color:#0a0e16; box-shadow: 0 8px 18px rgba(106,163,255,.35); cursor:pointer;
+      transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
+    }
+    .btn:hover{transform:translateY(-1px); filter:saturate(1.05)}
+    .btn:disabled{opacity:.7; cursor:wait}
+    .error, .ok{font-size:.92rem}
+    .error{color: color-mix(in oklab, var(--accent-2) 85%, white 10%)}
+    .ok{color:#9ae6b4}
+    .row{display:flex; gap:12px; flex-wrap:wrap}
+    @media (max-width: 720px){ .grid{grid-template-columns: 1fr} }
+    @keyframes slideUp{ from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:translateY(0)} }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="brand">
+        <span class="dot"></span>
+        <span>SocialNet</span>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a class="active" href="/register">Register</a></li>
+          <li><a href="/login">Login</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div class="pad">
+        <h1>Create account</h1>
+        <p class="muted">Заполни поля ниже. Поля с * обязательны.</p>
+
+        <!--
+          ВАЖНО:
+          - Эндпоинт ждёт Form(...), поэтому отправляем как FormData (multipart) либо x-www-form-urlencoded.
+          - Успешно -> сервер вернёт 303 на "/", браузер при обычной отправке сам перейдёт.
+          - Здесь перехватываем submit, чтобы красиво показать ошибки при {"status":0,"error":"..."}.
+        -->
+        <form id="registerForm" action="/register" method="POST" novalidate>
+          <div class="grid">
+            <div class="field">
+              <label for="name">Name *</label>
+              <input id="name" name="name" type="text" required minlength="2" autocomplete="given-name" />
+            </div>
+            <div class="field">
+              <label for="surname">Surname *</label>
+              <input id="surname" name="surname" type="text" required minlength="2" autocomplete="family-name" />
+            </div>
+
+            <div class="field">
+              <label for="username">Username *</label>
+              <input id="username" name="username" type="text" required pattern="^[a-zA-Z0-9_\.]{3,30}$" placeholder="letters, digits, _ or ." />
+            </div>
+            <div class="field">
+              <label for="email">Email *</label>
+              <input id="email" name="email" type="email" required autocomplete="email" />
+            </div>
+
+            <div class="field">
+              <label for="password">Password *</label>
+              <input id="password" name="password" type="password" required minlength="6" autocomplete="new-password" />
+            </div>
+            <div class="field">
+              <label for="phone_number">Phone number *</label>
+              <input id="phone_number" name="phone_number" type="tel" required
+                     placeholder="+998 90 123 45 67"
+                     pattern="^\+?\d[\d\s\-()]{7,}$" />
+            </div>
+
+            <div class="field">
+              <label for="birthday">Birthday *</label>
+              <input id="birthday" name="birthday" type="date" required />
+            </div>
+            <div class="field">
+              <label for="city">City *</label>
+              <input id="city" name="city" type="text" required />
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:12px">
+            <span id="formStatus" class="error" aria-live="polite"></span>
+          </div>
+
+          <div class="actions">
+            <button id="submitBtn" class="btn" type="submit">Create account</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+
+</body>
+</html>

@@ -12,7 +12,7 @@ class UserSchema(BaseModel):
     phone_number: str
     birthday: Optional[str] = None
     city: Optional[str] = None
-    reg_date: datetime
+
 
 
 class UserRead(BaseModel):
