@@ -38,3 +38,6 @@ async def update_post_api(post_id: int, post: PostSchema):
 async def delete_post_api(post_id: int):
     result = delete_post(post_id)
     return {"status": 1, "message": result}
+
+
+

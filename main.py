@@ -29,11 +29,11 @@ async def main(request: Request, uid: int):
     })
 
 
-@app.get("/exact-post/{pid}", include_in_schema=False, response_class=HTMLResponse)
-async def main(request: Request, pid: int):
-    all_posts = post_with_id(pid)
-    return templates.TemplateResponse(request, name="index.html", context={
-        "posts": all_posts
-    })
+# @app.get("/exact-post/{pid}", include_in_schema=False, response_class=HTMLResponse)
+# async def main(request: Request, pid: int):
+#     all_posts = post_with_id(pid)
+#     return templates.TemplateResponse(request, name="index.html", context={
+#         "posts": all_posts
+#     })
 
 # uvicorn main:app --reload
