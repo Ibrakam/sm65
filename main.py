@@ -131,6 +131,14 @@ async def login_form(username: str = Form(...),
     token = create_access_token(data={"sub": user.username})
     print(token)
     response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    response.set_cookie(
+        key="access_token",
+        value=f"Bearer {token}",
+        httponly=True,  # чтобы JS не видел
+        samesite="lax",  # норм для обычных переходов
+        # secure=True,   # включи на HTTPS
+        max_age=60 * 60 * 24  # 1 день, подбери как нужно
+    )
     return response
 
 
@@ -140,8 +148,8 @@ async def register_user_api(request: Request):
 
 
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)
-async def main(request: Request, uid: int, current_user: UserSchema = Depends(get_current_user)):
-    all_posts = all_user_posts(uid)
+async def main(request: Request, current_user: UserSchema = Depends(get_current_user)):
+    all_posts = all_user_posts(current_user.id)
     print(current_user)
     return templates.TemplateResponse(request, name="index.html", context={
         "user": current_user,
