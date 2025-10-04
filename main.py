@@ -122,6 +122,20 @@ async def get_current_user(token: str = Depends(oauth_schema)):
             return exception
     except jwt.JWTError:
         return exception
+    user = get_user(fake_db, username)
+    if user:
+        return user
+    return exception
+
+
+@app.get("/user/me", response_model=User)
+async def get_current_user_api(user: User = Depends(get_current_user)):
+    return user
+
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_html(request: Request):
+    return templates.TemplateResponse(request, name="login.html")
 
 
 @app.get("/register", response_class=HTMLResponse)
