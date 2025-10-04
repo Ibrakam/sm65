@@ -151,6 +151,7 @@
   </style>
 </head>
 <body>
+{% if user %}
     <header>
     <div class="wrap">
       <div class="brand">
@@ -248,6 +249,11 @@
   </aside>
     </div>
     <footer>© 2025 SocialNet</footer>
+{% else %}
+<a href="/login">Авторизоваться</a>
+<a href="/register">Зарегистрироваться</a>
+
+{% endif %}
 
 
 <script>

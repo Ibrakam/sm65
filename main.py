@@ -5,7 +5,7 @@ from api.photo.main import photo_router
 from api.post.main import post_router
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
-from database.userservice import get_all_or_exact_user, create_user_db
+from database.userservice import get_all_or_exact_user, create_user_db, get_user_by_username
 from database.postservice import all_user_posts, post_with_id
 from api.user.schemas import UserSchema
 from pydantic import BaseModel
@@ -14,6 +14,8 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from config import algorithm, access_token_exp_minutes, secret_key
 from datetime import timedelta, datetime
 from jose import jwt
+from deps import get_current_user
+
 
 templates = Jinja2Templates("templates")
 
@@ -91,8 +93,8 @@ def create_access_token(data, expire_date: Optional[timedelta] = 15):
     return encoded_jwt
 
 
-def authenticate_user(db, username, password):
-    user = get_user(db, username)
+def authenticate_user(username, password):
+    user = get_user_by_username(username)
     if user and verify_password(password, user.password):
         return user
     return False
@@ -100,7 +102,7 @@ def authenticate_user(db, username, password):
 
 @app.post("/token", response_model=Token)
 async def login(form: OAuth2PasswordRequestForm = Depends()):
-    user = authenticate_user(fake_db, form.username, form.password)
+    user = authenticate_user(form.username, form.password)
     if not user:
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                              detail="Неправильный пароль или username")
@@ -109,27 +111,8 @@ async def login(form: OAuth2PasswordRequestForm = Depends()):
             "token_type": "bearer"}
 
 
-oauth_schema = OAuth2PasswordBearer(tokenUrl="token")
-
-
-async def get_current_user(token: str = Depends(oauth_schema)):
-    exception = HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Error")
-    try:
-        payload = jwt.decode(token, secret_key, algorithms=[algorithm])
-
-        username = payload.get("sub")
-        if username is None:
-            return exception
-    except jwt.JWTError:
-        return exception
-    user = get_user(fake_db, username)
-    if user:
-        return user
-    return exception
-
-
-@app.get("/user/me", response_model=User)
-async def get_current_user_api(user: User = Depends(get_current_user)):
+@app.get("/user/me", response_model=UserSchema)
+async def get_current_user_api(user: UserSchema = Depends(get_current_user)):
     return user
 
 
@@ -138,17 +121,30 @@ async def login_html(request: Request):
     return templates.TemplateResponse(request, name="login.html")
 
 
+@app.post("/login", response_class=HTMLResponse)
+async def login_form(username: str = Form(...),
+                     password: str = Form(...)):
+    user = get_user_by_username(username)
+    if not user and not verify_password(password, user.password):
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                             detail="Неправильный пароль или username")
+    token = create_access_token(data={"sub": user.username})
+    print(token)
+    response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    return response
+
+
 @app.get("/register", response_class=HTMLResponse)
 async def register_user_api(request: Request):
     return templates.TemplateResponse(request, name="register.html")
 
 
-@app.get("/{uid}", include_in_schema=False, response_class=HTMLResponse)
-async def main(request: Request, uid: int):
-    exact_user = get_all_or_exact_user(user_id=uid)
+@app.get("/", include_in_schema=False, response_class=HTMLResponse)
+async def main(request: Request, uid: int, current_user: UserSchema = Depends(get_current_user)):
     all_posts = all_user_posts(uid)
+    print(current_user)
     return templates.TemplateResponse(request, name="index.html", context={
-        "user": exact_user,
+        "user": current_user,
         "posts": all_posts
     })
 
