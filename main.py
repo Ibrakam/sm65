@@ -131,6 +131,7 @@ async def login_form(username: str = Form(...),
     token = create_access_token(data={"sub": user.username})
     print(token)
     response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
     response.set_cookie(
         key="access_token",
         value=f"Bearer {token}",
@@ -139,6 +140,13 @@ async def login_form(username: str = Form(...),
         # secure=True,   # включи на HTTPS
         max_age=60 * 60 * 24  # 1 день, подбери как нужно
     )
+    return response
+
+
+@app.get("/logout", response_class=HTMLResponse)
+async def logout(request: Request):
+    response = RedirectResponse("/login", status_code=status.HTTP_301_MOVED_PERMANENTLY)
+    response.delete_cookie("access_token")
     return response
 
 

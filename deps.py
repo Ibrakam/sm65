@@ -25,6 +25,7 @@ async def get_current_user(request: Request, token: str | None = Depends(oauth_s
     # 1) Fallback to cookie if header isn't present
     if not token:
         token = request.cookies.get("access_token")
+
         print(token)
         if token and token.startswith("Bearer "):
             token = token.split(" ", 1)[1]
