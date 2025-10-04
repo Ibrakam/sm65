@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, Union
 from datetime import datetime
 
 
@@ -14,7 +14,6 @@ class UserSchema(BaseModel):
     city: Optional[str] = None
 
 
-
 class UserRead(BaseModel):
     status: int
-    message: bool
+    message: Union[int, bool]

@@ -10,7 +10,7 @@ def create_user_db(user: UserSchema):
         new_user = User(**user_data)
         db.add(new_user)
         db.commit()
-        return True
+        return new_user.id
 
 
 # Получение всех или определенного пользователя
