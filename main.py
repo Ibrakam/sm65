@@ -109,6 +109,21 @@ async def login(form: OAuth2PasswordRequestForm = Depends()):
             "token_type": "bearer"}
 
 
+oauth_schema = OAuth2PasswordBearer(tokenUrl="token")
+
+
+async def get_current_user(token: str = Depends(oauth_schema)):
+    exception = HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Error")
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=[algorithm])
+
+        username = payload.get("sub")
+        if username is None:
+            return exception
+    except jwt.JWTError:
+        return exception
+
+
 @app.get("/register", response_class=HTMLResponse)
 async def register_user_api(request: Request):
     return templates.TemplateResponse(request, name="register.html")
